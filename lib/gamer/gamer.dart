@@ -14,19 +14,26 @@ const GAME_PAD_MATRIX_W = 10;
 ///state of [GameControl]
 enum GameStates {
   none,
+
   paused,
+
   running,
+
   reset,
+
   mixing,
+
   clear,
+
   drop,
 }
 
 class Game extends StatefulWidget {
   final Widget child;
 
-  const Game({Key? key, required this.child})
-      : super(key: key);
+  const Game({Key key, @required this.child})
+      : assert(child != null),
+        super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -36,7 +43,7 @@ class Game extends StatefulWidget {
   static GameControl of(BuildContext context) {
     final state = context.findAncestorStateOfType<GameControl>();
     assert(state != null, "must wrap this context with [Game]");
-    return state!;
+    return state;
   }
 }
 
@@ -68,7 +75,7 @@ class GameControl extends State<Game> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+    routeObserver.subscribe(this, ModalRoute.of(context));
   }
 
   @override
@@ -95,23 +102,23 @@ class GameControl extends State<Game> with RouteAware {
 
   int _cleared = 0;
 
-  Block? _current;
+  Block _current;
 
-  Block? _next = Block.getRandom();
+  Block _next = Block.getRandom();
 
-  GameStates? _states = GameStates.none;
+  GameStates _states = GameStates.none;
 
   Block _getNext() {
     final next = _next;
     _next = Block.getRandom();
-    return next!;
+    return next;
   }
 
   SoundState get _sound => Sound.of(context);
 
   void rotate() {
     if (_states == GameStates.running && _current != null) {
-      final next = _current!.rotate();
+      final next = _current.rotate();
       if (next.isValidInMatrix(_data)) {
         _current = next;
         _sound.rotate();
@@ -124,7 +131,7 @@ class GameControl extends State<Game> with RouteAware {
     if (_states == GameStates.none && _level < _LEVEL_MAX) {
       _level++;
     } else if (_states == GameStates.running && _current != null) {
-      final next = _current!.right();
+      final next = _current.right();
       if (next.isValidInMatrix(_data)) {
         _current = next;
         _sound.move();
@@ -137,7 +144,7 @@ class GameControl extends State<Game> with RouteAware {
     if (_states == GameStates.none && _level > _LEVEL_MIN) {
       _level--;
     } else if (_states == GameStates.running && _current != null) {
-      final next = _current!.left();
+      final next = _current.left();
       if (next.isValidInMatrix(_data)) {
         _current = next;
         _sound.move();
@@ -149,9 +156,9 @@ class GameControl extends State<Game> with RouteAware {
   void drop() async {
     if (_states == GameStates.running && _current != null) {
       for (int i = 0; i < GAME_PAD_MATRIX_H; i++) {
-        final fall = _current!.fall(step: i + 1);
+        final fall = _current.fall(step: i + 1);
         if (!fall.isValidInMatrix(_data)) {
-          _current = _current!.fall(step: i);
+          _current = _current.fall(step: i);
           _states = GameStates.drop;
           setState(() {});
           await Future.delayed(const Duration(milliseconds: 100));
@@ -167,30 +174,30 @@ class GameControl extends State<Game> with RouteAware {
 
   void down({bool enableSounds = true}) {
     if (_states == GameStates.running && _current != null) {
-      final next = _current!.fall();
+      final next = _current.fall();
       if (next.isValidInMatrix(_data)) {
         _current = next;
         if (enableSounds) {
           _sound.move();
         }
       } else {
-        _mixCurrentIntoData(mixSound: () {  });
+        _mixCurrentIntoData();
       }
     }
     setState(() {});
   }
 
-  Timer? _autoFallTimer;
+  Timer _autoFallTimer;
 
   ///mix current into [_data]
-  Future<void> _mixCurrentIntoData({required void mixSound()}) async {
+  Future<void> _mixCurrentIntoData({void mixSound()}) async {
     if (_current == null) {
       return;
     }
     //cancel the auto falling task
     _autoFall(false);
 
-    _forTable((i, j) => _data[i][j] = _current!.get(j, i) ?? _data[i][j]);
+    _forTable((i, j) => _data[i][j] = _current.get(j, i) ?? _data[i][j]);
 
     final clearLines = [];
     for (int i = 0; i < GAME_PAD_MATRIX_H; i++) {
@@ -229,7 +236,7 @@ class GameControl extends State<Game> with RouteAware {
     } else {
       _states = GameStates.mixing;
       if (mixSound != null) mixSound();
-      _forTable((i, j) => _mask[i][j] = _current!.get(j, i) ?? _mask[i][j]);
+      _forTable((i, j) => _mask[i][j] = _current.get(j, i) ?? _mask[i][j]);
       setState(() {});
       await Future.delayed(const Duration(milliseconds: 200));
       _forTable((i, j) => _mask[i][j] = 0);
@@ -259,10 +266,10 @@ class GameControl extends State<Game> with RouteAware {
 
   void _autoFall(bool enable) {
     if (!enable && _autoFallTimer != null) {
-      _autoFallTimer!.cancel();
+      _autoFallTimer.cancel();
       _autoFallTimer = null;
     } else if (enable) {
-      _autoFallTimer!.cancel();
+      _autoFallTimer?.cancel();
       _current = _current ?? _getNext();
       _autoFallTimer = Timer.periodic(_SPEED[_level - 1], (t) {
         down(enableSounds: false);
@@ -287,6 +294,7 @@ class GameControl extends State<Game> with RouteAware {
 
   void reset() {
     if (_states == GameStates.none) {
+      //可以开始游戏
       _startGame();
       return;
     }
@@ -295,7 +303,7 @@ class GameControl extends State<Game> with RouteAware {
     }
     _sound.start();
     _states = GameStates.reset;
-    () async {
+        () async {
       int line = GAME_PAD_MATRIX_H;
       await Future.doWhile(() async {
         line--;
@@ -326,7 +334,7 @@ class GameControl extends State<Game> with RouteAware {
   }
 
   void _startGame() {
-    if (_states == GameStates.running && _autoFallTimer!.isActive == false) {
+    if (_states == GameStates.running && _autoFallTimer?.isActive == false) {
       return;
     }
     _states = GameStates.running;
@@ -340,7 +348,7 @@ class GameControl extends State<Game> with RouteAware {
     for (var i = 0; i < GAME_PAD_MATRIX_H; i++) {
       mixed.add(List.filled(GAME_PAD_MATRIX_W, 0));
       for (var j = 0; j < GAME_PAD_MATRIX_W; j++) {
-        int value = _current!.get(j, i) ?? _data[i][j];
+        int value = _current?.get(j, i) ?? _data[i][j];
         if (_mask[i][j] == -1) {
           value = 0;
         } else if (_mask[i][j] == 1) {
@@ -351,7 +359,7 @@ class GameControl extends State<Game> with RouteAware {
     }
     debugPrint("game states : $_states");
     return GameState(
-        mixed, _states!, _level, _sound.mute, _points, _cleared, _next!,
+        mixed, _states, _level, _sound.mute, _points, _cleared, _next,
         child: widget.child);
   }
 
@@ -365,7 +373,7 @@ class GameControl extends State<Game> with RouteAware {
 class GameState extends InheritedWidget {
   GameState(this.data, this.states, this.level, this.muted, this.points,
       this.cleared, this.next,
-      {Key? key, required this.child})
+      {Key key, this.child})
       : super(key: key, child: child);
 
   final Widget child;
@@ -385,7 +393,7 @@ class GameState extends InheritedWidget {
   final Block next;
 
   static GameState of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<GameState>()!;
+    return context.dependOnInheritedWidgetOfExactType<GameState>();
   }
 
   @override

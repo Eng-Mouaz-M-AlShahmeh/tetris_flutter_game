@@ -16,7 +16,7 @@ class Screen extends StatelessWidget {
   ///the with of screen
   final double width;
 
-  const Screen({Key? key, required this.width}) : super(key: key);
+  const Screen({Key key, @required this.width}) : super(key: key);
 
   Screen.fromHeight(double height) : this(width: ((height - 6) / 2 + 6) / 0.6);
 
@@ -57,7 +57,7 @@ class Shake extends StatefulWidget {
   ///true to shake screen vertically
   final bool shake;
 
-  const Shake({Key? key, required this.child, required this.shake})
+  const Shake({Key key, @required this.child, @required this.shake})
       : super(key: key);
 
   @override
@@ -65,7 +65,7 @@ class Shake extends StatefulWidget {
 }
 
 class _ShakeState extends State<Shake> with TickerProviderStateMixin {
-  AnimationController? _controller;
+  AnimationController _controller;
 
   @override
   void initState() {
@@ -81,18 +81,18 @@ class _ShakeState extends State<Shake> with TickerProviderStateMixin {
   void didUpdateWidget(Shake oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.shake) {
-      _controller!.forward(from: 0);
+      _controller.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
-    _controller!.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   v.Vector3 _getTranslation() {
-    double progress = _controller!.value;
+    double progress = _controller.value;
     double offset = sin(progress * pi) * 1.5;
     return v.Vector3(0, offset, 0.0);
   }

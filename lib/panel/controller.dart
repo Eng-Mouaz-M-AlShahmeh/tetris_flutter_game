@@ -226,10 +226,10 @@ class _Button extends StatefulWidget {
   final bool enableLongPress;
 
   const _Button(
-      {Key? key,
-      required this.size,
-      required this.onTap,
-      required this.icon,
+      {Key key,
+      @required this.size,
+      @required this.onTap,
+      @required this.icon,
       this.color = Colors.teal,
       this.enableLongPress = true})
       : super(key: key);
@@ -249,10 +249,10 @@ class _Description extends StatelessWidget {
   final AxisDirection direction;
 
   const _Description({
-    Key? key,
-    required this.text,
+    Key key,
+    @required this.text,
     this.direction = AxisDirection.down,
-    required this.child,
+    @required this.child,
   })  : assert(direction != null),
         super(key: key);
 
@@ -292,11 +292,11 @@ class _Description extends StatelessWidget {
 }
 
 class _ButtonState extends State<_Button> {
-  Timer? _timer;
+  Timer _timer;
 
   bool _tapEnded = false;
 
-  Color? _color;
+  Color _color;
 
   @override
   void didUpdateWidget(_Button oldWidget) {

@@ -47,7 +47,7 @@ class _NextBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     List<List<int>> data = [List.filled(4, 0), List.filled(4, 0)];
     final next = BLOCK_SHAPES[GameState.of(context).next.type];
-    for (int i = 0; i < next!.length; i++) {
+    for (int i = 0; i < next.length; i++) {
       for (int j = 0; j < next[i].length; j++) {
         data[i][j] = next[i][j];
       }
@@ -72,13 +72,13 @@ class _GameStatus extends StatefulWidget {
 }
 
 class _GameStatusState extends State<_GameStatus> {
-  Timer? _timer;
+  Timer _timer;
 
   bool _colonEnable = true;
 
-  int? _minute;
+  int _minute;
 
-  int? _hour;
+  int _hour;
 
   @override
   void initState() {
@@ -107,9 +107,9 @@ class _GameStatusState extends State<_GameStatus> {
         SizedBox(width: 4),
         IconPause(enable: GameState.of(context).states == GameStates.paused),
         Spacer(),
-        Number(number: _hour!, length: 2, padWithZero: true),
+        Number(number: _hour, length: 2, padWithZero: true),
         IconColon(enable: _colonEnable),
-        Number(number: _minute!, length: 2, padWithZero: true),
+        Number(number: _minute, length: 2, padWithZero: true),
       ],
     );
   }

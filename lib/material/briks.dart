@@ -8,9 +8,9 @@ const _COLOR_HIGHLIGHT = Color(0xFF560000);
 
 class BrikSize extends InheritedWidget {
   const BrikSize({
-    Key? key,
-    required this.size,
-    required Widget child,
+    Key key,
+    @required this.size,
+    @required Widget child,
   })  : assert(child != null),
         super(key: key, child: child);
 
@@ -19,7 +19,7 @@ class BrikSize extends InheritedWidget {
   static BrikSize of(BuildContext context) {
     final brikSize = context.dependOnInheritedWidgetOfExactType<BrikSize>();
     assert(brikSize != null, "....");
-    return brikSize!;
+    return brikSize;
   }
 
   @override
@@ -32,7 +32,7 @@ class BrikSize extends InheritedWidget {
 class Brik extends StatelessWidget {
   final Color color;
 
-  const Brik._({Key? key, required this.color}) : super(key: key);
+  const Brik._({Key key, @required this.color}) : super(key: key);
 
   const Brik.normal() : this._(color: _COLOR_NORMAL);
 

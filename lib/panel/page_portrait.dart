@@ -35,7 +35,7 @@ class PagePortrait extends StatelessWidget {
 
 class RewardButton extends StatefulWidget {
   const RewardButton({
-    Key? key,
+    Key key,
   }) : super(key: key);
 
   @override
@@ -43,8 +43,6 @@ class RewardButton extends StatefulWidget {
 }
 
 class _RewardButtonState extends State<RewardButton> {
-  final FocusNode _rewardFocusNode =
-      FocusNode(canRequestFocus: false, skipTraversal: true);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +54,7 @@ class _RewardButtonState extends State<RewardButton> {
 class _ScreenDecoration extends StatelessWidget {
   final Widget child;
 
-  const _ScreenDecoration({Key? key, required this.child}) : super(key: key);
+  const _ScreenDecoration({Key key, @required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

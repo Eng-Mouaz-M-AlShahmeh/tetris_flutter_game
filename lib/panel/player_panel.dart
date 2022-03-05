@@ -14,7 +14,7 @@ class PlayerPanel extends StatelessWidget {
   //the size of player panel
   final Size size;
 
-  PlayerPanel({Key? key, required double width})
+  PlayerPanel({Key key, @required double width})
       : assert(width != null && width != 0),
         size = Size(width, width * 2),
         super(key: key);

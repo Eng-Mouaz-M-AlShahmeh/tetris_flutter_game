@@ -72,50 +72,50 @@ const ORIGIN = {
 enum BlockType { I, L, J, Z, S, O, T }
 
 class Block {
-  final BlockType? type;
-  final List<List<int>?>? shape;
-  final List<int>? xy;
-  final int? rotateIndex;
+  final BlockType type;
+  final List<List<int>> shape;
+  final List<int> xy;
+  final int rotateIndex;
 
   Block(this.type, this.shape, this.xy, this.rotateIndex);
 
   Block fall({int step = 1}) {
-    return Block(type, shape, [xy![0], xy![1] + step], rotateIndex);
+    return Block(type, shape, [xy[0], xy[1] + step], rotateIndex);
   }
 
   Block right() {
-    return Block(type, shape, [xy![0] + 1, xy![1]], rotateIndex);
+    return Block(type, shape, [xy[0] + 1, xy[1]], rotateIndex);
   }
 
   Block left() {
-    return Block(type, shape, [xy![0] - 1, xy![1]], rotateIndex);
+    return Block(type, shape, [xy[0] - 1, xy[1]], rotateIndex);
   }
 
   Block rotate() {
     List<List<int>> result =
-        List.filled(shape![0]!.length, [], growable: false);
-    for (int row = 0; row < shape!.length; row++) {
-      for (int col = 0; col < shape![row]!.length; col++) {
+    List.filled(shape[0].length, null, growable: false);
+    for (int row = 0; row < shape.length; row++) {
+      for (int col = 0; col < shape[row].length; col++) {
         if (result[col] == null) {
-          result[col] = List.filled(shape!.length, 0, growable: false);
+          result[col] = List.filled(shape.length, 0, growable: false);
         }
-        result[col][row] = shape![shape!.length - 1 - row]![col];
+        result[col][row] = shape[shape.length - 1 - row][col];
       }
     }
     final nextXy = [
-      this.xy![0] + ORIGIN[type]![rotateIndex!][0],
-      this.xy![1] + ORIGIN[type]![rotateIndex!][1]
+      this.xy[0] + ORIGIN[type][rotateIndex][0],
+      this.xy[1] + ORIGIN[type][rotateIndex][1]
     ];
     final nextRotateIndex =
-        rotateIndex! + 1 >= ORIGIN[this.type]!.length ? 0 : rotateIndex! + 1;
+    rotateIndex + 1 >= ORIGIN[this.type].length ? 0 : rotateIndex + 1;
 
     return Block(type, result, nextXy, nextRotateIndex);
   }
 
   bool isValidInMatrix(List<List<int>> matrix) {
-    if (xy![1] + shape!.length > GAME_PAD_MATRIX_H ||
-        xy![0] < 0 ||
-        xy![0] + shape![0]!.length > GAME_PAD_MATRIX_W) {
+    if (xy[1] + shape.length > GAME_PAD_MATRIX_H ||
+        xy[0] < 0 ||
+        xy[0] + shape[0].length > GAME_PAD_MATRIX_W) {
       return false;
     }
     for (var i = 0; i < matrix.length; i++) {
@@ -131,13 +131,13 @@ class Block {
 
   ///return null if do not show at [x][y]
   ///return 1 if show at [x,y]
-  int? get(int x, int y) {
-    x -= xy![0];
-    y -= xy![1];
-    if (x < 0 || x >= shape![0]!.length || y < 0 || y >= shape!.length) {
+  int get(int x, int y) {
+    x -= xy[0];
+    y -= xy[1];
+    if (x < 0 || x >= shape[0].length || y < 0 || y >= shape.length) {
       return null;
     }
-    return shape![y]![x] == 1 ? 1 : null;
+    return shape[y][x] == 1 ? 1 : null;
   }
 
   static Block fromType(BlockType type) {
